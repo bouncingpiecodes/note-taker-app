@@ -43,7 +43,18 @@ app.post("/api/notes", (req, res) => {
 app.get("/api/notes", (req, res) => {
   res.sendFile(path.join(__dirname, "/db/db.json"));
 });
+
 // DELETE API route for notes
+app.delete("/api/notes/:id", (req, res) => {
+  res.json(dbNotes);
+  const deleteIndex = dbNotes.findIndex((note) => {
+    return note.id === req.params.id;
+  });
+  dbNotes.splice(deleteIndex, 1);
+  fs.writeFile("/db/db.json", JSON.stringify(dbNotes), (err) =>
+    err ? console.log(err) : console.log("Note deleted from database")
+  );
+});
 
 // Set listening on PORT
 app.listen(PORT, () => console.log("server running"));
