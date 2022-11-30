@@ -3,6 +3,8 @@ const express = require("express");
 const path = require("path");
 const app = express();
 const { clog } = require("./middleware/clog");
+const fs = require("fs");
+// const api = require("./routes/index.js");
 
 // Set PORT variable
 const PORT = process.env.PORT || 3001;
@@ -12,7 +14,6 @@ app.use(express.static(__dirname + "/public"));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use("/api", api);
 // Set express functions
 
 // GET route for homepage
@@ -29,10 +30,19 @@ app.get("/notes", (req, res) => {
 
 // Post APi route for notes
 app.post("/api/notes", (req, res) => {
-  console.log(123);
-  console.log(req);
+  let db = JSON.parse(fs.readFileSync(path.join(__dirname, "/db/db.json")));
+  db.push(req.body);
+  fs.writeFile(
+    path.join(__dirname, "/db/db.json"),
+    JSON.stringify(db),
+    {},
+    (err) => console.log(err)
+  );
 });
 
+app.get("/api/notes", (req, res) => {
+  res.sendFile(path.join(__dirname, "/db/db.json"));
+});
 // DELETE API route for notes
 
 // Set listening on PORT
