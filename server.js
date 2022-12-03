@@ -4,6 +4,7 @@ const path = require("path");
 const app = express();
 const { clog } = require("./middleware/clog");
 const fs = require("fs");
+const guid = require("guid");
 // const api = require("./routes/index.js");
 
 // Set PORT variable
@@ -31,13 +32,14 @@ app.get("/notes", (req, res) => {
 // Post APi route for notes
 app.post("/api/notes", (req, res) => {
   let db = JSON.parse(fs.readFileSync(path.join(__dirname, "/db/db.json")));
-  db.push(req.body);
+  db.push({ ...req.body, id: guid.create() });
   fs.writeFile(
     path.join(__dirname, "/db/db.json"),
     JSON.stringify(db),
     {},
     (err) => console.log(err)
   );
+  res.sendStatus(200);
 });
 
 app.get("/api/notes", (req, res) => {
@@ -54,6 +56,7 @@ app.delete("/api/notes/:id", (req, res) => {
   fs.writeFile("/db/db.json", JSON.stringify(dbNotes), (err) =>
     err ? console.log(err) : console.log("Note deleted from database")
   );
+  res.sendStatus(200);
 });
 
 // Set listening on PORT
