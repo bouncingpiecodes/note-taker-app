@@ -48,14 +48,20 @@ app.get("/api/notes", (req, res) => {
 
 // DELETE API route for notes
 app.delete("/api/notes/:id", (req, res) => {
-  res.json(dbNotes);
-  const deleteIndex = dbNotes.findIndex((note) => {
-    return note.id === req.params.id;
+  const { id } = req.params;
+  let db = JSON.parse(
+    fs.readFileSync(path.join(__dirname, "/db/db.json"))
+  ).filter((record) => {
+    return record.id !== id;
   });
-  dbNotes.splice(deleteIndex, 1);
-  fs.writeFile("/db/db.json", JSON.stringify(dbNotes), (err) =>
-    err ? console.log(err) : console.log("Note deleted from database")
+  fs.writeFile(
+    path.join(__dirname, "/db/db.json"),
+    JSON.stringify(db),
+    {},
+    (err) => console.log(err)
   );
+
+  console.log({ id });
   res.sendStatus(200);
 });
 
